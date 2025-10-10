@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aransiola Jesutosin</title>
+  <!-- External CSS -->
+  <link rel="stylesheet" href="stylesheet/style.css" />
+  <!-- FontAwesome for icons -->
+  <script src="https://kit.fontawesome.com/68b337f46a.js" crossorigin="anonymous" defer></script>
+  <!-- Your JS (deferred) -->
+  <script src="scripts/app.js" defer></script>
+  <link rel="icon" href="./images/pngd.png" type="image/x-icon" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.10.1/lottie.min.js" defer></script>
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="home" id="js-home">
+    <div class="navbar pi-1">
+      <!-- Logo -->
+      <a href="#js-home">
+        <img src="./images/pngd.png" alt="Logo" class="navbar-logo">
+      </a>
+
+      <!-- Primary navigation links -->
+      <ul id="primary-navigation">
+        <li><a href="#js-home">Home</a></li>
+        <li><a href="#js-about">About</a></li>
+        <li><a href="#js-services">Services</a></li>
+        <li><a href="#js-projects">My Work</a></li>
+        <li><a href="./blog.html">Blog/Articles</a></li>
+        <li class="mobile-only" style="display:none;">
+          <button id="theme-toggle-mobile" aria-label="Toggle theme (mobile)">
+            <i class="fas fa-moon" aria-hidden="true"></i>
+            <span class="mobile-theme-text"> Theme</span>
+            </button>
+        </li>
+
+      </ul>
+
+      <!-- Menu toggle for mobile -->
+      <button class="menu-bar" aria-expanded="false" aria-label="Open menu">
+        <svg viewBox="0 0 100 100" width="40" aria-hidden="true">
+          <rect class="line top" width="80" height="8" x="10" y="25" rx="5"></rect>
+          <rect class="line middle" width="80" height="8" x="10" y="45" rx="5"></rect>
+          <rect class="line bottom" width="80" height="8" x="10" y="65" rx="5"></rect>
+        </svg>
+      </button>
+
+      <!-- Dark mode toggle -->
+      <button id="theme-toggle" aria-label="Toggle theme">
+        <i class="fas fa-moon" aria-hidden="true"></i>
+      </button>
+
+      <!-- Contact pill (button opens the consult modal) -->
+      <button id="nav-contact" class="contact-cta" aria-haspopup="dialog">
+        Contact <span class="arrow">↗</span>
+      </button>
+    </div>
+
+    <!-- Hero section -->
+    <div class="hero pi-1">
+      <div class="hero-text">
+        <h2>Hello, it's Me</h2>
+        <h1 class="name">
+          <span style="color: #808080;">Aransiola</span> Jesutosin
+        </h1>
+        <!-- Inside the .hero-text section -->
+        <h3 class="subtitle">
+          <span class="typing desktop-text">I build ridiculous—and ridiculously smart—tech. Software, hardware, or a Frankenstein of both.</span>
+          <span class="typing mobile-text" style="display: none;">I build ridiculous—and ridiculously smart—tech.</span>
+        </h3>
+        <p>If you are looking for a freelance designer to bring an idea to life and</p>
+        <p>are on a tight timeline let’s jam.</p>
+        <div class="hero-btn">
+          <a class="btn btn-primary" href="#js-cta">Contact me</a>
+          <a class="btn btn-secondary" href="https://drive.google.com/file/d/1iCbUD_No7KzIuwYZm9_muJpEIinC2yKD/view?usp=drive_link" target="_blank" rel="noopener noreferrer">Download CV</a>
+        </div>
+      </div>
+      <div class="hero-animation">
+      <div id="hero-animation" style="width: 400px; height: 400px;"></div>
+    </div>
+
+    </div>
+  </header>
+
+  <main>
+    <!-- About -->
+    <div class="about p-2 reveal" id="js-about">
+      <div class="about-inner pi-1">
+        <h3 class="eyebrow">Introduction</h3>
+        <h2 class="section-header about-heading">About me</h2>
+
+        <div class="about-grid">
+           <!-- Lottie animation container -->
+            <div class="about-animation" id="about-animation"></div>
+
+          <div class="about-content">
+            <p class="about-lead">
+              I am an experienced Frontend Developer with over a decade of professional expertise in the field.
+              Throughout my career, I have had the privilege of collaborating with prestigious organizations,
+              contributing to their success and growth.
+            </p>
+
+            <div class="about-cards">
+              <article class="mini-card" aria-labelledby="lang-title">
+                <div class="mini-icon"><i class="fas fa-code" aria-hidden="true"></i></div>
+                <h4 id="lang-title">Languages</h4>
+                <p class="mini-desc">HTML, CSS, JavaScript<br>React Js, Next Js</p>
+              </article>
+
+              <article class="mini-card" aria-labelledby="edu-title">
+                <div class="mini-icon"><i class="fas fa-graduation-cap" aria-hidden="true"></i></div>
+                <h4 id="edu-title">Education</h4>
+                <p class="mini-desc">B.Tech in Computer Science</p>
+              </article>
+
+              <article class="mini-card" aria-labelledby="proj-title">
+                <div class="mini-icon"><i class="fas fa-briefcase" aria-hidden="true"></i></div>
+                <h4 id="proj-title">Projects</h4>
+                <p class="mini-desc">Built more than 5 projects</p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Services -->
+    <div class="services p-2 reveal" id="js-services" aria-labelledby="services-heading">
+      <div class="services-inner pi-1">
+        <h3 class="eyebrow">What I offer</h3>
+        <h2 id="services-heading" class="section-header services-heading">My Services</h2>
+
+        <p class="services-lead">
+          I am a  developer from Nigeria, Lagos with 10 years of experience in multiple companies like Educify, and dirichi.
+        </p>
+
+        <div class="services-grid" role="list">
+          <article class="service-card" role="listitem">
+            <div class="service-icon" aria-hidden="true"><i class="fas fa-globe"></i></div>
+            <h4 class="service-title">Web design</h4>
+            <p class="service-desc">Web development is the process of building, programming and maintaining websites and web apps.</p>
+            <a class="read-more" href="#">Read more →</a>
+          </article>
+
+          <article class="service-card" role="listitem">
+            <div class="service-icon" aria-hidden="true"><i class="fab fa-android"></i></div>
+            <h4 class="service-title">Mobile app</h4>
+            <p class="service-desc">Mobile app development involves creating software for mobile devices (iOS, Android) with great UX.</p>
+            <a class="read-more" href="#">Read more →</a>
+          </article>
+
+          <article class="service-card" role="listitem">
+            <div class="service-icon" aria-hidden="true"><i class="fas fa-object-group"></i></div>
+            <h4 class="service-title">UI/UX design</h4>
+            <p class="service-desc">UI/UX design focuses on creating a seamless and delightful user experience across products.</p>
+            <a class="read-more" href="#">Read more →</a>
+          </article>
+
+          <article class="service-card" role="listitem">
+            <div class="service-icon" aria-hidden="true"><i class="far fa-image"></i></div>
+            <h4 class="service-title">Graphics design</h4>
+            <p class="service-desc">Creative design solutions to enhance visual communication across web and social platforms.</p>
+            <a class="read-more" href="#">Read more →</a>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- Call To Action -->
+    <div class="call-to-action reveal" id="js-cta" aria-labelledby="cta-heading">
+      <div class="cta-inner pi-1">
+        <div class="cta-content">
+          <h3 id="cta-heading" class="cta-title">Ready to build something great?</h3>
+          <p class="cta-sub">I help businesses ship polished web & mobile products fast. Book a free 15-minute consultation and let’s talk scope.</p>
+          <p style="margin-top:.5rem; color:var(--secondary); font-size:.95rem;">Quick, no-commitment call — bring your idea or wireframe.</p>
+        </div>
+
+        <div class="cta-actions">
+          <button id="open-consult" class="cta-btn primary" aria-haspopup="dialog">Book a free consult</button>
+          <a class="cta-btn secondary" href="https://drive.google.com/file/d/1iCbUD_No7KzIuwYZm9_muJpEIinC2yKD/view?usp=drive_link" target="_blank" rel="noopener noreferrer">Download CV</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: booking form -->
+    <div id="consult-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="consult-modal-title">
+      <div class="modal" role="document">
+        <header>
+          <div>
+            <h4 id="consult-modal-title">Book a free 15-minute consult</h4>
+            <p>Tell me a bit about the project — I'll follow up to schedule.</p>
+          </div>
+          <button id="close-modal" aria-label="Close dialog" class="btn-ghost">&times;</button>
+        </header>
+
+        <form id="consult-form">
+          <div class="form-row">
+            <input type="text" id="client-name" name="name" placeholder="Your name" required aria-label="Your name" />
+          </div>
+
+          <div class="form-row">
+            <input type="email" id="client-email" name="email" placeholder="Your email" required aria-label="Your email" />
+          </div>
+
+          <div class="form-row">
+            <textarea id="client-message" name="message" rows="4" placeholder="Short description or links (e.g., GitHub, Figma)" aria-label="Short description"></textarea>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" id="cancel-modal" class="btn-ghost">Cancel</button>
+            <button type="submit" class="btn-primary-modal">Send request</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Portfolio -->
+    <div class="my-portfolio p-2 reveal" id="js-projects" aria-labelledby="projects-heading">
+      <div class="portfolio-inner pi-1" style="max-width:1200px; margin:0 auto;">
+        <div class="portfolio-hero" style="text-align:center; margin-bottom:2.25rem;">
+          <p class="eyebrow" style="margin-bottom:.5rem; color:var(--secondary); font-weight:600;">My portfolio</p>
+          <h2 id="projects-heading" class="section-header" style="font-family:'Playfair Display', serif; font-size: clamp(2.2rem, 6vw, 4.25rem); margin:0 0 .75rem; color:var(--fg);">
+            My latest work
+          </h2>
+          <p style="max-width:880px; margin:0 auto; color:var(--secondary); line-height:1.7;">
+            Welcome to my project showcase. Explore a collection of my recent work across frontend, backend (AI), robotics and IoT/embedded systems.
+          </p>
+        </div>
+
+        <div class="portfolio-wrapper">
+          <div class="portfolio-grid" role="list" aria-label="Featured projects">
+            
+            <article class="portfolio-card" role="listitem" tabindex="0"
+                     data-title="Smart Room"
+                     data-desc="Smart Room — full room automation (bin, lights, toilet, sensors) using embedded systems & IoT."
+                     data-link="articles/chessboard.html">
+              <img src="./images/Modern Smart Living Room Setup.png" alt="Smart room / IoT">
+              <div class="portfolio-meta">
+                <div class="meta-text">
+                  <div class="meta-title">Smart Room</div>
+                  <div class="meta-sub">IoT / Embedded System</div>
+                </div>
+                <div class="meta-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7 17L17 7"></path><path d="M7 7h10v10"></path>
+                  </svg>
+                </div>
+              </div>
+            </article>
+            <article class="portfolio-card" role="listitem" tabindex="0"
+                     data-title="Robotics"
+                     data-desc="Automatic chessboard — motorized moves, sensors and embedded control (hardware + code)."
+                     data-link="articles/chessboard.html">
+              <img src="./images/20250412_0618_Automatic Chessboard in Action_simple_compose_01jrm6w435envrwrcv6kw99pqr.png" alt="Automatic chessboard">
+              <div class="portfolio-meta">
+                <div class="meta-text">
+                  <div class="meta-title">Robotics</div>
+                  <div class="meta-sub">Automatic chessboard</div>
+                </div>
+                <div class="meta-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7 17L17 7"></path><path d="M7 7h10v10"></path>
+                  </svg>
+                </div>
+              </div>
+            </article>
+            <article class="portfolio-card" role="listitem" tabindex="0"
+                     data-title="Backend project"
+                     data-desc="AI Recommendation System — teacher-student matching, notifications, and auto-booking (Python + SQLAlchemy + RandomForest)."
+                     data-link="articles/chessboard.html">
+              <img src="./images/backend.png" alt="AI recommendation system">
+              <div class="portfolio-meta">
+                <div class="meta-text">
+                  <div class="meta-title">Backend project</div>
+                  <div class="meta-sub">AI Recommendation System</div>
+                </div>
+                <div class="meta-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7 17L17 7"></path><path d="M7 7h10v10"></path>
+                  </svg>
+                </div>
+              </div>
+            </article>
+
+            <article class="portfolio-card" role="listitem" tabindex="0"
+                     data-title="Frontend project"
+                     data-desc="Responsive front-end project showcasing modern UI, animations and accessibility."
+                     data-link="articles/chessboard.html">
+              <img src="./images/frontend.png" alt="Frontend project screenshot">
+              <div class="portfolio-meta">
+                <div class="meta-text">
+                  <div class="meta-title">Frontend project</div>
+                  <div class="meta-sub">Web design</div>
+                </div>
+                <div class="meta-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7 17L17 7"></path><path d="M7 7h10v10"></path>
+                  </svg>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- hidden extra projects -->
+          <div id="portfolio-more" class="portfolio-grid more-grid" aria-hidden="true" style="display:none; margin-top:18px;">
+            <article class="portfolio-card placeholder" tabindex="0" data-title="More projects" data-desc="Extra work — replace later.">
+              <img src="./images/portfolio-placeholder.jpg" alt="extra">
+              <div class="portfolio-meta">
+                <div class="meta-text">
+                  <div class="meta-title">More projects</div>
+                  <div class="meta-sub">Coming soon</div>
+                </div>
+                <div class="meta-icon" aria-hidden="true">→</div>
+              </div>
+            </article>
+          </div>
+
+          <div style="text-align:center; margin-top:28px;">
+            <button id="toggle-projects" class="btn btn-secondary" aria-expanded="false">Show more</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project modal -->
+      <div id="project-modal" class="modal-backdrop" role="dialog" aria-hidden="true" aria-labelledby="project-modal-title" style="display:none;">
+        <div class="modal" role="document">
+          <header>
+            <h4 id="project-modal-title">Project</h4>
+            <button id="close-project-modal" class="btn-ghost" aria-label="Close project details">✕</button>
+          </header>
+          <div class="modal-body">
+            <p id="project-modal-desc" style="color:var(--secondary); margin-top:.5rem;">Description</p>
+      <!-- Read More Button -->
+            <a id="project-modal-link" href="#" class="btn btn-secondary" target="_blank" style="margin-top:1rem; display:inline-block;">
+        Read More →
+      </a>
+    </div>
+  </div>
+</div>
+
+    </div>
+<!-- Playground / Typing Challenge (restored simple card) -->
+<section id="fun-zone" class="reveal" aria-labelledby="fun-zone-title">
+  <div class="pi-1" style="max-width:1200px;margin:0 auto;">
+    <h2 id="fun-zone-title" class="section-header" style="margin-bottom:1rem;">Playground</h2>
+
+    <div class="fun-grid" style="display:flex;justify-content:center;">
+      <!-- Typing challenge card -->
+      <a href="./typing-game.html" target="_blank" rel="noopener noreferrer"
+         class="fun-card" id="typing-challenge" role="button"
+         aria-label="Open Typing Challenge — Beat the leaderboard" tabindex="0">
+        <div class="fun-glow" aria-hidden="true"></div>
+
+        <div class="fun-inner">
+          <div class="fun-badge">🔥 New</div>
+          <h3 class="fun-title">Typing Challenge</h3>
+          <p class="fun-desc">Test your speed, climb the leaderboard, and beat the highest score.</p>
+
+          <!-- Optional leaderboard preview -->
+          <div class="fun-leaderboard" id="fun-leaderboard" aria-hidden="true">
+            <strong>Top:</strong> <span id="fun-top-score">—</span>
+          </div>
+
+          <div class="fun-cta" aria-hidden="true">Play →</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="p-2 reveal" id="js-footer">
+    <h4>Aransiola Jesutosin Software Development</h4>
+    <div class="email">
+      <i class="fa fa-envelope" aria-hidden="true"></i>
+      <a href="mailto:jesutosinfavour@gmail.com">jesutosinfavour@gmail.com</a>
+    </div>
+    <div class="social">
+      <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+      <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+      <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+    </div>
+    <p>© 2024 Aransiola Jesutosin. All rights reserved.</p>
+  </footer>
+</body>
+</html>

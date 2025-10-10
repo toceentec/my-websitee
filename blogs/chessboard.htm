@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Automatic Chessboard — Build Log</title>
+  <style>
+    /* Minimal, clean styling inspired by your blog theme */
+    :root{
+      --bg1:#0f172a; --bg2:#1e293b; --muted:#94a3b8; --card-bg:rgba(255,255,255,0.03);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:"Poppins",system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial; background:linear-gradient(135deg,var(--bg1),var(--bg2)); color:#fff; line-height:1.6; min-height:100vh}
+    .container{max-width:1000px;margin:32px auto;padding:24px}
+    .hero{text-align:center;margin-bottom:18px}
+    .hero h1{font-size:2rem;background:linear-gradient(90deg,#60a5fa,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .hero p{color:var(--muted);margin-top:8px}
+
+    .grid{display:grid;grid-template-columns:1fr;gap:16px}
+    .card{background:var(--card-bg);border:1px solid rgba(255,255,255,0.04);padding:18px;border-radius:12px}
+    .meta{color:var(--muted);font-size:0.95rem;margin-bottom:8px}
+    h2{font-size:1.25rem;margin-bottom:8px}
+    h3{margin-top:12px;margin-bottom:6px}
+    p.lead{color:#cbd5e1}
+    ul{margin-left:1rem;margin-bottom:10px}
+    ol{margin-left:1rem;margin-bottom:10px}
+    pre{background:rgba(255,255,255,0.03);padding:12px;border-radius:8px;overflow:auto;color:#e6eef8}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,"Roboto Mono","Courier New",monospace}
+    a.button{display:inline-block;padding:8px 12px;border-radius:10px;text-decoration:none;font-weight:600;background:linear-gradient(90deg,#60a5fa,#7c3aed);color:#02122b}
+    .back{display:inline-block;margin-top:12px;color:#a5b4fc;text-decoration:none}
+
+    /* Copy button for code blocks */
+    .code-toolbar{position:relative}
+    .copy-btn{position:absolute;right:8px;top:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.04);padding:6px 8px;border-radius:8px;cursor:pointer;color:var(--muted);font-size:0.85rem}
+
+    @media (max-width:600px){.container{padding:12px}.hero h1{font-size:1.5rem}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="hero">
+      <h1>Automatic Chessboard — Build Log</h1>
+      <p>Funny, honest, and technical — everything you need to rebuild (or mock) my attempt to make a chessboard that moves pieces for you.</p>
+    </header>
+
+    <main class="grid">
+      <article class="card">
+        <p class="meta">Posted: October 10, 2025 · ~8 min read</p>
+        <h2>The short story</h2>
+        <p class="lead">I wanted a board that could move its pieces like a wizard. What I built was a noisy, fiddly gantry with an electromagnet that picks up pieces and moves them on an X–Y axis controlled by an Arduino. It doesn’t detect pieces (yet) — you have to tell it where to go. I also scrapped a lot and restarted. That’s normal.</p>
+
+        <h3>What this page contains</h3>
+        <ul>
+          <li>A clear parts list and wiring checklist</li>
+          <li>An Arduino sketch to run the gantry (AccelStepper-based)</li>
+          <li>A step-by-step assembly and calibration guide</li>
+          <li>Tips, pitfalls, and next-step ideas (sensors, CV, closed-loop)</li>
+        </ul>
+      </article>
+
+      <article class="card" id="parts">
+        <h2>Parts & components</h2>
+        <ul>
+          <li><strong>Frame & bed</strong>: plywood, MDF, or aluminium extrusion (8×8 grid clearance — plan square size).</li>
+          <li><strong>Gantry</strong>: GT2 belts + pulleys (fast) OR lead-screws (precise). Add linear rails/shafts for rigidity.</li>
+          <li><strong>Motors</strong>: 2× NEMA17 stepper motors (X and Y).</li>
+          <li><strong>Drivers</strong>: A4988/DRV8825 for cheap builds; <em>TMC2209/TMC2208</em> for quiet operation.</li>
+          <li><strong>Controller</strong>: Arduino Uno or Mega.</li>
+          <li><strong>Pickup</strong>: small DC electromagnet (sized to grip a washer under piece).</li>
+          <li><strong>Switching</strong>: logic-level MOSFET (e.g., IRLZ44N or better) plus diode/snubber across coil.</li>
+          <li><strong>Endstops</strong>: 2 mechanical or optical limit switches for homing.</li>
+          <li><strong>Power</strong>: 12V supply (capable of motor + magnet current). Add decoupling capacitors for motor drivers.</li>
+          <li><strong>Misc</strong>: GT2 belts, pulleys, M3/M4 screws, spacers, washers, small PCB or perfboard for wiring, and jumpers.</li>
+        </ul>
+
+        <h3>Wiring checklist (keep grounds common)</h3>
+        <ul>
+          <li>Connect Arduino GND to power supply GND and driver GND.</li>
+          <li>Driver VMOT → +12V. Driver GND → common GND.</li>
+          <li>STEP → Arduino step pin. DIR → Arduino dir pin. ENABLE optional.</li>
+          <li>Electromagnet: +12V → electromagnet coil → MOSFET drain; MOSFET source → GND. Gate → Arduino digital pin via 220Ω. Add 100k pulldown to gate. Add diode or RC snubber across coil for kickback.</li>
+          <li>Limit switches → Arduino digital pins with INPUT_PULLUP for homing logic.</li>
+        </ul>
+      </article>
+
+      <article class="card" id="firmware">
+        <h2>Firmware (Arduino) — AccelStepper example</h2>
+        <p class="lead">This sketch is a well-commented starter. It implements homing, simple square-to-step conversion, and a serial command interface. <strong>Calibrate <code>STEPS_PER_SQUARE</code> for your mechanics</strong>.</p>
+
+        <div class="code-toolbar">
+          <button class="copy-btn" data-target="code-accel">Copy</button>
+          <pre id="code-accel"><code>// Automatic Chessboard - AccelStepper starter sketch
+// Requires: AccelStepper library (install via Library Manager)
+
+#include &lt;AccelStepper.h&gt;
+
+// --- PINOUT (edit to match your wiring) ---
+const int X_STEP_PIN = 2;
+const int X_DIR_PIN  = 5;
+const int Y_STEP_PIN = 3;
+const int Y_DIR_PIN  = 6;
+const int EM_PIN     = 10; // MOSFET gate for electromagnet
+const int X_HOME_PIN = 11; // limit switch (HOME)
+const int Y_HOME_PIN = 12;
+
+// Create two stepper objects (DRIVER mode: step + dir)
+AccelStepper stepperX(AccelStepper::DRIVER, X_STEP_PIN, X_DIR_PIN);
+AccelStepper stepperY(AccelStepper::DRIVER, Y_STEP_PIN, Y_DIR_PIN);
+
+// --- TUNE THIS ---
+const long STEPS_PER_SQUARE = 400; // steps to move one board square (calibrate)
+const int HOMING_SPEED = 800;      // steps/sec used during homing
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(EM_PIN, OUTPUT); digitalWrite(EM_PIN, LOW);
+  pinMode(X_HOME_PIN, INPUT_PULLUP);
+  pinMode(Y_HOME_PIN, INPUT_PULLUP);
+
+  stepperX.setMaxSpeed(3000);
+  stepperX.setAcceleration(1500);
+  stepperY.setMaxSpeed(3000);
+  stepperY.setAcceleration(1500);
+
+  Serial.println("Starting... performing homing");
+  homeAll();
+  Serial.println("Ready. Use commands like: m e2 e4");
+}
+
+void homeAll(){
+  // Move negative until limit switches trigger
+  stepperX.setSpeed(-HOMING_SPEED);
+  stepperY.setSpeed(-HOMING_SPEED);
+
+  bool xHomed=false, yHomed=false;
+  while (!xHomed || !yHomed){
+    if (!xHomed){ stepperX.runSpeed(); if (digitalRead(X_HOME_PIN)==LOW) { stepperX.setCurrentPosition(0); xHomed=true; stepperX.stop(); Serial.println("X homed");}}
+    if (!yHomed){ stepperY.runSpeed(); if (digitalRead(Y_HOME_PIN)==LOW) { stepperY.setCurrentPosition(0); yHomed=true; stepperY.stop(); Serial.println("Y homed");}}
+  }
+  delay(100);
+}
+
+void moveToXY(long xSteps, long ySteps){
+  stepperX.moveTo(xSteps);
+  stepperY.moveTo(ySteps);
+  while (stepperX.distanceToGo()!=0 || stepperY.distanceToGo()!=0){
+    stepperX.run();
+    stepperY.run();
+  }
+}
+
+void moveToSquare(char file, int rank){
+  int fi = tolower(file) - 'a';
+  int ri = rank - 1;
+  long x = fi * STEPS_PER_SQUARE;
+  long y = ri * STEPS_PER_SQUARE;
+  moveToXY(x,y);
+}
+
+void pickUp(){
+  digitalWrite(EM_PIN, HIGH); // engage magnet
+  delay(180);
+}
+void drop(){
+  digitalWrite(EM_PIN, LOW); // release
+  delay(120);
+}
+
+void movePiece(char fFile, int fRank, char tFile, int tRank){
+  moveToSquare(fFile,fRank);
+  delay(80);
+  pickUp();
+  moveToSquare(tFile,tRank);
+  delay(80);
+  drop();
+}
+
+// Serial protocol: expects lines like: m e2 e4
+void loop(){
+  if (Serial.available()){
+    String s = Serial.readStringUntil('\n');
+    s.trim();
+    if (s.length()>0 && s.charAt(0)=='m'){
+      // simple parser (no error checking for brevity)
+      if (s.length()>=7){
+        char fFile = s.charAt(2);
+        int fRank = s.charAt(3)-'0';
+        char tFile = s.charAt(5);
+        int tRank = s.charAt(6)-'0';
+        Serial.print("Moving "); Serial.print(fFile); Serial.print(fRank); Serial.print(" -> "); Serial.println(String(tFile)+String(tRank));
+        movePiece(fFile,fRank,tFile,tRank);
+        Serial.println("Done.");
+      }
+    }
+  }
+}
+</code></pre>
+        </div>
+        <p class="small">Tip: paste this into Arduino IDE and tweak <code>STEPS_PER_SQUARE</code> and pin numbers to match your wiring.</p>
+      </article>
+
+      <article class="card" id="step-by-step">
+        <h2>Step-by-step assembly & calibration</h2>
+        <ol>
+          <li><strong>Design the bed & gantry:</strong> decide square size (e.g., 40mm). Ensure X/Y travel covers 8 squares + margin.</li>
+          <li><strong>Mount motors & drivers:</strong> attach NEMA17 motors and driver boards. Use mounting plates and secure pulleys.</li>
+          <li><strong>Create carriage:</strong> mount electromagnet and consider adding a small Z-lift (micro servo) if pickup reliability is poor.</li>
+          <li><strong>Wire up:</strong> follow the wiring checklist; keep grounds common and add motor driver capacitors per datasheet.</li>
+          <li><strong>Homing:</strong> place two limit switches at bottom-left corner; run homing and verify position 0,0.</li>
+          <li><strong>Calibrate steps:</strong> measure steps-per-mm (or steps per square) by commanding tight moves and counting steps. Update sketch constant.</li>
+          <li><strong>Test movement:</strong> move between a few squares without magnet to check for slop/backlash.</li>
+          <li><strong>Test pickup:</strong> put a steel washer under a chess piece, lower magnet, energize, and lift. Adjust timings and height.</li>
+          <li><strong>Refine:</strong> tune acceleration/speed on steppers, quiet drivers (TMC), and mechanical stiffness.</li>
+        </ol>
+
+        <h3>Next upgrades</h3>
+        <ul>
+          <li>Add reed switches or Hall sensors under squares for passive detection.</li>
+          <li>Use a camera + computer vision (Raspberry Pi + OpenCV) to build a board state map.</li>
+          <li>Implement closed-loop encoders on motors for step verification.</li>
+          <li>Improve UX: small web UI to send moves, or integrate with chess engines like Stockfish.</li>
+        </ul>
+      </article>
+
+      <article class="card" id="tips">
+        <h2>Troubleshooting & tips</h2>
+        <ul>
+          <li><strong>Missed steps:</strong> increase current limit on driver, tension belts, or reduce acceleration.</li>
+          <li><strong>Noise:</strong> use TMC drivers for quiet operation.</li>
+          <li><strong>Pieces sticking:</strong> try momentary shake routine after drop or throw a tiny Z-lift.</li>
+          <li><strong>Power:</strong> magnet draws a lot — consider a separate supply or beefier PSU.</li>
+        </ul>
+        <p class="lead">This project is a learning playground. Expect to redo parts. Expect frustration. Expect to laugh when a pawn decides to roll off the board.</p>
+        <a class="back" href="#top">⤴ Back to top</a>
+      </article>
+
+    </main>
+
+    <footer style="text-align:center;margin-top:18px;color:var(--muted)">Made by you — tweak, rebuild, repeat. Want this as separate files or a downloadable .ino? Tell me and I’ll export it.</footer>
+  </div>
+
+  <script>
+    // Copy-to-clipboard for code blocks
+    document.querySelectorAll('.copy-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const id = btn.getAttribute('data-target') || btn.nextElementSibling.id;
+        const codeEl = document.getElementById(id) || btn.nextElementSibling;
+        if (!codeEl) return;
+        const text = codeEl.innerText;
+        navigator.clipboard.writeText(text).then(()=>{
+          btn.innerText='Copied';
+          setTimeout(()=>btn.innerText='Copy',1200);
+        }).catch(()=>{ btn.innerText='Fail'; setTimeout(()=>btn.innerText='Copy',1200); });
+      });
+    });
+  </script>
+</body>
+</html>

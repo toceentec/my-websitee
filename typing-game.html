@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Typing Challenge — Test your speed</title>
+  <link rel="stylesheet" href="./typing-game.css">
+</head>
+<body>
+  <main class="page">
+    <header class="game-header">
+      <h1>Typing Challenge</h1>
+      <p class="subtitle">Type the sentence exactly. Finish to save your score to the Top-5 (local).</p>
+    </header>
+
+    <!-- name area -->
+    <section class="name-section" id="name-section" aria-label="Player name">
+      <label for="player-name" class="sr">Enter your name</label>
+      <div class="name-row">
+        <input id="player-name" type="text" placeholder="Enter your display name" maxlength="30" />
+        <button id="save-name">Save</button>
+        <button id="edit-name" class="ghost" style="display:none;">Edit</button>
+      </div>
+      <p class="hint">Your name is stored in your browser. No login required.</p>
+    </section>
+
+    <!-- game -->
+    <section class="game-area" id="game-area" aria-label="Typing game" hidden>
+      <div class="panel">
+        <div class="target-container" id="target-container" aria-live="polite"></div>
+
+        <textarea id="type-input"
+                  aria-label="Type here"
+                  rows="3"
+                  placeholder="Start typing the sentence above..."
+                  autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+
+        <div class="controls">
+          <button id="new-round" class="primary">New sentence</button>
+          <button id="submit-as-is" class="secondary" title="Finish now (submit current result)">Submit as-is</button>
+          <button id="clear-input" class="ghost">Clear</button>
+        </div>
+
+        <div class="stats-row">
+          <div><strong>Time</strong><div id="time">0.0s</div></div>
+          <div><strong>WPM</strong><div id="wpm">0</div></div>
+          <div><strong>Accuracy</strong><div id="accuracy">0%</div></div>
+          <div><strong>Progress</strong><div id="progress">0%</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- result modal/area -->
+    <section id="result-area" class="result-area" hidden>
+      <div class="result-card" role="dialog" aria-modal="true" aria-labelledby="result-title">
+        <h2 id="result-title">Result</h2>
+        <p id="result-text"></p>
+        <div class="result-stats" id="result-stats"></div>
+        <div class="result-actions">
+          <button id="play-again" class="primary">Play again</button>
+          <button id="close-result" class="ghost">Close</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- leaderboard -->
+    <aside class="leaderboard" aria-label="Leaderboard">
+      <h2>Top 5 (local)</h2>
+      <table id="leaderboard-table">
+        <thead><tr><th>Rank</th><th>Name</th><th>WPM</th><th>Accuracy</th><th>When</th></tr></thead>
+        <tbody id="leaderboard-body"></tbody>
+      </table>
+      <p class="footnote">Scores are stored on your browser. Later we can sync them to an online leaderboard.</p>
+    </aside>
+
+  </main>
+  <!-- FIREBASE (CDN) + init: paste this BEFORE your game script -->
+<!-- REPLACE your existing firebase <script> block with this (compat CDN) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script>
+  // Your web app's Firebase configuration (from console)
+  const firebaseConfig = {
+    apiKey: "AIzaSyA_x9W5AE_9p1ETOgYxfS5Qcv0iCcArwK0",
+    authDomain: "typing-leaderboard.firebaseapp.com",
+    projectId: "typing-leaderboard",
+    storageBucket: "typing-leaderboard.firebasestorage.app",
+    messagingSenderId: "684450356117",
+    appId: "1:684450356117:web:5b372176e7c0e14a06f49c",
+    measurementId: "G-1Y7DR07CJB"
+  };
+
+  // Initialize Firebase (compat / namespaced)
+  firebase.initializeApp(firebaseConfig);
+  // optional analytics
+  if (firebase.analytics) {
+    try { firebase.analytics(); } catch(e) { /* ignore if not allowed */ }
+  }
+  // make a global db variable your code can use
+  const db = firebase.firestore();
+  window.db = db;
+</script>
+<script src="./typing-game.js"></script>
+
+</body>
+</html>

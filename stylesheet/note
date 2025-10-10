@@ -1,0 +1,245 @@
+/* ================================
+   Base Theme Foundation
+   ================================ */
+:root {
+  --primary: #2A7FFF;      /* blue from your logo */
+  --secondary: #6C757D;    /* neutral gray for text */
+  --accent: #FF8C42;       /* orange accent */
+  --bg: #FFFFFF;           /* light mode background */
+  --fg: #1E1E1E;           /* main text */
+  --card-bg: #F9F9F9;      /* cards / sections */
+  --border: #E5E5E5;
+  --btn-hover: #1E6AE1;
+}
+
+[data-theme="dark"] {
+  --bg: #121212;
+  --fg: #F5F5F5;
+  --card-bg: #1E1E1E;
+  --border: #2C2C2C;
+  --secondary: #A0A0A0;
+  --btn-hover: #3A90FF;
+}
+
+/* ================================
+   Reset & Base Styles
+   ================================ */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.6;
+}
+
+/* ================================
+   Navbar
+   ================================ */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar a {
+  color: var(--fg);
+  margin: 0 1rem;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.navbar a:hover {
+  color: var(--primary);
+}
+
+.navbar-logo {
+  width: 45px;
+  height: 45px;
+}
+
+/* ================================
+   Hero Section
+   ================================ */
+.hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4rem 2rem;
+  background: linear-gradient(
+    135deg,
+    var(--primary) 0%,
+    var(--accent) 100%
+  );
+  color: #fff;
+  border-radius: 12px;
+  margin: 2rem;
+}
+
+.hero-text h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.hero-text h2 {
+  font-weight: 400;
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.hero-btn .btn {
+  margin: 0.5rem;
+}
+
+/* ================================
+   Buttons
+   ================================ */
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--btn-hover);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+}
+
+.btn-secondary:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* ================================
+   Sections
+   ================================ */
+section,
+.about,
+.services,
+.my-portfolio,
+.call-to-action {
+  padding: 4rem 2rem;
+  background: var(--bg);
+}
+
+.section-header {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--fg);
+  text-align: center;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 1.5px;
+  color: var(--secondary);
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+/* ================================
+   Cards
+   ================================ */
+.service-card,
+.mini-card,
+.portfolio-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-card:hover,
+.mini-card:hover,
+.portfolio-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* ================================
+   Portfolio Images
+   ================================ */
+.portfolio-card img {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+/* ================================
+   CTA Section
+   ================================ */
+.call-to-action {
+  background: var(--primary);
+  color: #fff;
+  text-align: center;
+  border-radius: 12px;
+}
+
+.call-to-action .cta-btn {
+  margin: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+/* ================================
+   Footer
+   ================================ */
+footer {
+  background: var(--card-bg);
+  color: var(--secondary);
+  text-align: center;
+  padding: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+footer h4 {
+  color: var(--fg);
+  margin-bottom: 1rem;
+}
+
+footer .social a {
+  color: var(--secondary);
+  margin: 0 0.5rem;
+  font-size: 1.2rem;
+}
+
+footer .social a:hover {
+  color: var(--primary);
+}

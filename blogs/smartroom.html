@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Smart Room — Build Guide</title>
+  <link rel="stylesheet" href="./stylesheet/blog.css" />
+  <style>
+    /* small extras so code blocks read well on your dark theme */
+    .article {
+      max-width: 900px;
+      margin: 3rem auto;
+      background: rgba(255,255,255,0.02);
+      border-radius: 12px;
+      padding: 2rem;
+      color: #e6eef8;
+      box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+    .article h1, .article h2, .article h3 { color: white; }
+    .parts, .tips { margin: 0.6rem 0 1.2rem 0; color: #cbd5e1; }
+    pre.code { background: rgba(0,0,0,0.45); padding: 14px; border-radius: 8px; overflow:auto; color:#dbeafe; }
+    .small-note { color:#94a3b8; font-size:0.95rem; margin-top:0.6rem; }
+    ul.check { margin-left: 1.1rem; color:#cbd5e1; }
+    .chip { display:inline-block; padding:6px 10px; border-radius:999px; background:linear-gradient(90deg,#60a5fa,#7c3aed); color:#02122b; font-weight:700; }
+  </style>
+</head>
+<body>
+  <div class="article">
+    <h1>Smart Room — Build Guide</h1>
+    <p class="small-note">
+      This page shows how I built: the <span class="chip">Auto Bin</span>, the <span class="chip">Toilet Flusher</span> (same mechanism), and the <span class="chip">Smart Light</span>.
+      All builds are Arduino-based and designed to be simple, cheap and easy to reproduce.
+    </p>
+
+    <h2>Overview — what I used (quick)</h2>
+    <ul class="check">
+      <li>Arduino UNO / Nano (any 5V Arduino will do)</li>
+      <li>SG90 / MG90S servo (for the spoon mechanism that presses the bin/toilet).</li>
+      <li>HC-SR04 ultrasonic sensor (distance detection)</li>
+      <li>Speaker + DFPlayer Mini (or use a phone + HC-05 for TTS/voice)</li>
+      <li>HC-05 / HC-06 Bluetooth module (optional) for remote on/off</li>
+      <li>1-channel 5V relay module (for mains / lamp switching) — or use a solid-state relay for AC loads</li>
+      <li>Battery pack (5V regulator, or 3–4x AA / 5V power bank) + wiring</li>
+      <li>Wires, header pins, screws, small plastic spoon (mechanism), hot glue, small plywood or acrylic mounting plate</li>
+    </ul>
+
+    <h2>1) Auto Bin (servo + spoon + ultrasonic + voice)</h2>
+    <p class="parts"><strong>Parts</strong>: Servo, HC-SR04, Arduino, small spoon (or thin strip), DFPlayer Mini + microSD + small speaker (or just a passive speaker), power supply (5V), wires.</p>
+
+    <h3>How it works (short)</h3>
+    <p class="small-note">When the ultrasonic detects a hand/object within a set distance (e.g. &lt; 20 cm), the Arduino rotates the servo which swings the spoon to press the bin lid (or push a latch). Optionally play a short sound using the DFPlayer Mini.</p>
+
+    <h3>Mechanical tip — spoon mechanism</h3>
+    <ul class="check">
+      <li>Attach the spoon to the servo horn using a small screw/zip-tie. Balance so the servo doesn't stall.</li>
+      <li>Use a small bracket or hot glue to create a pivot that allows the spoon to press the bin lid without slipping.</li>
+      <li>Use a return angle (servo moves e.g. 0° -> 70° -> back to 10°). Test angles before final mounting.</li>
+    </ul>
+
+    <h3>Wiring (Bin)</h3>
+    <pre class="code">
+HC-SR04:
+  Vcc -> 5V
+  GND -> GND
+  Trig -> Arduino pin 7
+  Echo -> Arduino pin 6
+
+Servo:
+  Vcc -> 5V (prefer separate 5V regulator or use 5V power bank)
+  GND -> GND (common ground!)
+  Signal -> Arduino pin 5
+
+DFPlayer Mini (optional voice):
+  Vcc -> 5V
+  GND -> GND
+  TX  -> Arduino RX via SoftwareSerial pin 10
+  RX  -> Arduino TX via SoftwareSerial pin 11
+Speaker -> DFPlayer speaker pins
+    </pre>
+
+    <p class="small-note">
+      <strong>Power note:</strong> Servos draw spikes when moving — don't power them directly from Arduino if using heavy loads. Use a dedicated 5V supply (power bank, 5V regulator) and connect grounds together.
+    </p>
+
+    <h3>Arduino sketch — auto bin with DFPlayer voice</h3>
+    <p class="small-note">This sketch uses the DFRobotDFPlayerMini library (install via Library Manager) and SoftwareSerial. If you don't use DFPlayer, ignore the DFPlayer parts.</p>
+
+    <pre class="code">
+// AutoBin: ultrasonic -> servo, optional DFPlayer voice
+#include &lt;Servo.h&gt;
+#include &lt;SoftwareSerial.h&gt;
+#include "DFRobotDFPlayerMini.h"
+
+Servo binServo;
+const int trigPin = 7;
+const int echoPin = 6;
+const int servoPin = 5;
+const int triggerDistance = 20; // cm
+unsigned long lastTrigger = 0;
+const unsigned long triggerCooldown = 2500; // ms
+
+// DFPlayer (optional)
+SoftwareSerial dfSerial(10, 11); // RX, TX (to DFPlayer)
+DFRobotDFPlayerMini dfplayer;
+bool useDFPlayer = true;
+
+void setup() {
+  Serial.begin(9600);
+  binServo.attach(servoPin);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  binServo.write(10); // rest angle
+  // init DFPlayer
+  if (useDFPlayer) {
+    dfSerial.begin(9600);
+    if (!dfplayer.begin(dfSerial)) {
+      Serial.println("DFPlayer not found");
+      useDFPlayer = false;
+    } else {
+      dfplayer.volume(20); // 0..30
+    }
+  }
+}
+
+long readDistanceCm() {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  long duration = pulseIn(echoPin, HIGH, 30000);
+  long dist = duration * 0.034 / 2;
+  return dist;
+}
+
+void openBin() {
+  // play sound if available
+  if (useDFPlayer) dfplayer.play(1); // file 0001.mp3 on microSD
+  binServo.write(75); // adjust to your mech
+  delay(700);
+  binServo.write(12); // back to rest
+}
+
+void loop() {
+  long d = readDistanceCm();
+  if (d > 0 && d < triggerDistance) {
+    if (millis() - lastTrigger > triggerCooldown) {
+      lastTrigger = millis();
+      openBin();
+    }
+  }
+  delay(120);
+}
+    </pre>
+
+    <p class="small-note">Put an mp3 named <code>0001.mp3</code> on the root of the microSD for DFPlayer to play track 1. If you prefer voice TTS, skip DFPlayer and use a phone + HC-05 to send a signal to Arduino to play an action.</p>
+
+    <h2>2) Toilet Flusher — same mechanism</h2>
+    <p class="small-note">I reused the exact same servo+spoon approach for the toilet flusher. Mount the spoon or small lever to push the flush lever, calibrate angles, and protect the servo from splashes (use a small enclosure or waterproof the area).</p>
+    <ul class="check">
+      <li>Use the same Arduino sketch as the bin — just change servo angles and sensor position.</li>
+      <li>Place the ultrasonic sensor across from where a user approaches (so it triggers when they are in front of the pan).</li>
+    </ul>
+
+    <h2>3) Smart Light (Relay) + Voice/Bluetooth Control</h2>
+    <p class="parts">Parts: 1-channel 5V relay module, Arduino, HC-05 Bluetooth (optional), lamp or LED strip, appropriate AC caution if switching mains.</p>
+
+    <h3>Wiring (Light)</h3>
+    <pre class="code">
+Relay module:
+  Vcc -> 5V
+  GND -> GND
+  IN  -> Arduino pin 4  (digital output)
+
+HC-05 (optional, for Bluetooth control):
+  Vcc -> 5V (or 3.3V depending on module)
+  GND -> GND
+  TX  -> Arduino RX via SoftwareSerial pin 8
+  RX  -> Arduino TX via SoftwareSerial pin 9
+
+Lamp:
+  Lamp's live wire -> relay COM
+  Lamp's neutral -> mains neutral (be careful)
+  Relay NO -> mains live (only connect mains if you know what you're doing)
+    </pre>
+
+    <p class="small-note"><strong>SAFETY:</strong> If you are switching mains AC, you must know basic electrical safety. Use insulated connectors, fuse protection, and, if unsure, use a qualified electrician. For testing, use a low-voltage lamp or LED strip.</p>
+
+    <h3>Arduino sketch — relay controlled via Bluetooth commands</h3>
+    <p class="small-note">This listens for simple text commands over Bluetooth: <code>ON</code> or <code>OFF</code>. You can use a phone terminal app to send those commands.</p>
+    <pre class="code">
+#include &lt;SoftwareSerial.h&gt;
+SoftwareSerial btSerial(8, 9); // RX, TX (to HC-05)
+const int relayPin = 4;
+
+void setup() {
+  Serial.begin(9600);
+  btSerial.begin(9600);
+  pinMode(relayPin, OUTPUT);
+  digitalWrite(relayPin, LOW); // relay off (change if your module is active LOW)
+}
+
+void loop() {
+  if (btSerial.available()) {
+    String cmd = btSerial.readStringUntil('\\n');
+    cmd.trim();
+    Serial.println("BT cmd: " + cmd);
+    if (cmd.equalsIgnoreCase("ON")) {
+      digitalWrite(relayPin, HIGH);
+      Serial.println("Light ON");
+    } else if (cmd.equalsIgnoreCase("OFF")) {
+      digitalWrite(relayPin, LOW);
+      Serial.println("Light OFF");
+    }
+  }
+  // optional: echo Serial -> BT
+  if (Serial.available()) {
+    btSerial.write(Serial.read());
+  }
+}
+    </pre>
+
+    <p class="small-note">If you want voice commands, use phone voice assistant + a Bluetooth terminal app that converts speech to text then send commands to HC-05. Another option: connect a small microphone + speech-to-text module (more advanced).</p>
+
+    <h2>Power & Battery tips</h2>
+    <ul class="check">
+      <li>Servos need stable 5V. Use a separate 5V regulator or power bank for servos if they draw a lot.</li>
+      <li>Always connect grounds together (Arduino, servo supply, DFPlayer, Bluetooth, battery negative).</li>
+      <li>Put a 1000 µF electrolytic capacitor across servo power rails to absorb current spikes.</li>
+      <li>If using Li-ion/LiPo batteries, use a proper charger/TP4056 board and a protection circuit. Never short them.</li>
+    </ul>
+
+    <h2>Testing & calibration checklist</h2>
+    <ol class="check">
+      <li>Test the ultrasonic sensor reading via Serial monitor and adjust <code>triggerDistance</code>.</li>
+      <li>Test servo motion without the mechanical load — check angles in code and adjust.</li>
+      <li>If using DFPlayer, test sound playback first with a small speaker and a proven mp3 file.</li>
+      <li>Test the relay with a low-voltage lamp before connecting mains AC.</li>
+      <li>Place everything in position, then test the complete sequence.</li>
+    </ol>
+
+    <h2>Troubleshooting quick hits</h2>
+    <ul class="check">
+      <li><strong>Servo jitter / not moving:</strong> check power & ground, use separate power for servo, add capacitor.</li>
+      <li><strong>Ultrasonic gives weird values:</strong> check wiring, ensure sensor faces the target, add a short smoothing average.</li>
+      <li><strong>DFPlayer not found:</strong> check wiring TX/RX swapped, use correct baud (9600), check microSD format (FAT32), ensure MP3 filename is correct.</li>
+      <li><strong>Bluetooth not connecting:</strong> power cycle module, check pairing PIN (usually 1234/0000), ensure correct baud rate.</li>
+    </ul>
+
+    <h2>Final notes</h2>
+    <p class="small-note">This is a practical, low-cost setup — perfect for demos and hacky home automation. If you want, I can:</p>
+    <ul class="check">
+      <li>Combine the two Arduino sketches into one multi-function sketch (bin + toilet + lights + central menu).</li>
+      <li>Make a downloadable wiring diagram image (SVG) you can use in your blog.</li>
+      <li>Create a tidy, production-ready version with a proper enclosure and a PCB design.</li>
+    </ul>
+
+    <p class="small-note">Tell me which of those you want next and I’ll add it straight into this page.</p>
+  </div>
+</body>
+</html>

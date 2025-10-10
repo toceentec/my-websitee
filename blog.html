@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog | My Portfolio</title>
+
+  <style>
+    /* ========== Your original CSS ========== */
+    /* General Reset */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #fff;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Hero Section */
+    .blog-hero {
+      text-align: center;
+      padding: 4rem 1rem;
+    }
+    .blog-hero h1 {
+      font-size: 2.8rem;
+      background: linear-gradient(90deg, #60a5fa, #7c3aed);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .blog-hero p {
+      margin-top: 0.8rem;
+      font-size: 1.1rem;
+      color: #94a3b8;
+    }
+
+    /* Blog Grid */
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    /* Blog Card with Glass Effect */
+    .blog-card {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .blog-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    }
+
+    /* Card Image */
+    .blog-img {
+      height: 200px;
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* Card Content */
+    .blog-info {
+      padding: 1.5rem;
+    }
+    .blog-info h2 {
+      font-size: 1.4rem;
+      margin-bottom: 0.6rem;
+    }
+    .blog-info p {
+      font-size: 0.95rem;
+      color: #cbd5e1;
+      margin-bottom: 1rem;
+    }
+
+    /* Button */
+    .btn-read {
+      display: inline-block;
+      padding: 0.6rem 1.2rem;
+      border-radius: 10px;
+      background: linear-gradient(90deg, #60a5fa, #7c3aed);
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      transition: opacity 0.25s ease;
+    }
+    .btn-read:hover {
+      opacity: 0.85;
+    }
+
+    /* ========== Added badge + modal styles ========== */
+
+    /* ---- Soon badge (card) ---- */
+    .soon-badge {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: linear-gradient(90deg, #60a5fa, #7c3aed);
+      color: #02122b;
+      font-weight: 700;
+      font-size: 0.72rem;
+      padding: 6px 10px;
+      border-radius: 999px;
+      letter-spacing: 0.6px;
+      box-shadow: 0 6px 18px rgba(124,58,237,0.16);
+      z-index: 4;
+    }
+
+    /* ---- Coming Soon modal (dark themed) ---- */
+    .cs-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1200;
+      font-family: "Poppins", sans-serif;
+    }
+    .cs-modal.open { display: flex; }
+
+    .cs-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.72);
+      backdrop-filter: blur(5px);
+    }
+
+    .cs-panel {
+      position: relative;
+      width: clamp(300px, 88vw, 640px);
+      background: linear-gradient(180deg, rgba(7,10,25,0.9), rgba(17,24,39,0.95));
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.04);
+      box-shadow: 0 20px 50px rgba(2,6,23,0.6);
+      z-index: 2;
+      overflow: hidden;
+      color: #fff;
+      animation: csFade 260ms ease;
+    }
+
+    .cs-content {
+      padding: 24px;
+      text-align: center;
+    }
+
+    #cs-title {
+      font-size: 1.45rem;
+      margin-bottom: 8px;
+      background: linear-gradient(90deg, #60a5fa, #7c3aed);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .cs-teaser { color: #cbd5e1; margin-bottom: 12px; line-height: 1.45; }
+    .cs-bullets { text-align: left; color: #94a3b8; margin: 8px 0 16px; padding-left: 1.1rem; }
+
+    .cs-actions { display:flex; gap: 10px; justify-content:center; flex-wrap:wrap; }
+    .cs-btn {
+      padding: 0.6rem 1.25rem;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      border: none;
+    }
+    .cs-btn-primary {
+      background: linear-gradient(90deg,#60a5fa,#7c3aed);
+      color: #02122b;
+    }
+    .cs-btn-secondary {
+      background: transparent;
+      color: #94a3b8;
+      border: 1px solid rgba(71,85,105,0.6);
+    }
+    .cs-btn-secondary:hover { color: #fff; border-color: #7c3aed; }
+
+    .cs-close {
+      position: absolute;
+      right: 12px;
+      top: 8px;
+      font-size: 20px;
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+    }
+    .cs-small { color: #64748b; margin-top: 10px; font-size: 0.85rem; }
+
+    @keyframes csFade {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width:480px) {
+      .cs-content { padding: 16px; }
+      #cs-title { font-size: 1.2rem; }
+      .soon-badge { top: 10px; right: 10px; padding: 5px 8px; font-size: 0.66rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="blog-hero">
+    <h1>My Blog & Articles</h1>
+    <p>Dive deeper into my projects, experiments, and ideas.</p>
+  </header>
+
+  <main class="blog-grid">
+    <!-- Blog Card -->
+    <article class="blog-card">
+      <div class="blog-img" style="background-image: url('./images/Modern%20Smart%20Living%20Room%20Setup.png')"></div>
+      <div class="blog-info">
+        <h2>Smart Room — IoT Innovation</h2>
+        <p>Smart lighting, bins, and toilets all integrated into one automated system.</p>
+        <a href="./blogs/smartroom.html" class="btn-read">Read More</a>
+      </div>
+    </article>
+
+    <article class="blog-card">
+      <div class="blog-img" style="background-image: url('./images/20250412_0618_Automatic\ Chessboard\ in\ Action_simple_compose_01jrm6w435envrwrcv6kw99pqr.png')"></div>
+      <div class="blog-info">
+        <h2>Automatic Chessboard</h2>
+        <p>A custom-built chessboard that moves pieces automatically with magnets.</p>
+        <a href="chessboard.html" class="btn-read">Read More</a>
+      </div>
+    </article>
+
+    <!-- Self-Driving card (intercepted) -->
+    <article class="blog-card">
+      <div class="blog-img" style="background-image: url('images/self-driving-kart.jpg')"></div>
+      <div class="blog-info">
+        <h2>Self-Driving Go-Kart</h2>
+        <p>How I built a mini autonomous kart using sensors, Raspberry Pi & AI.</p>
+
+        <!-- badge -->
+        <span class="soon-badge">SOON</span>
+
+        <!-- intercept clicks with class "coming-soon" -->
+        <a href="self-driving-kart.html" class="btn-read coming-soon">Read More</a>
+      </div>
+    </article>
+    </main>
+
+  <!-- Coming Soon Modal -->
+  <div id="comingSoonModal" class="cs-modal" aria-hidden="true" role="dialog" aria-labelledby="cs-title">
+    <div class="cs-overlay" data-close></div>
+
+    <div class="cs-panel" role="document">
+      <button class="cs-close" aria-label="Close coming soon dialog" data-close>&times;</button>
+
+      <div class="cs-content">
+        <h2 id="cs-title">Self-Driving Go-Kart — Coming Soon 🚀</h2>
+        <p class="cs-teaser">
+          Finalizing the build log: parts, wiring diagrams, control code and the first test footage. Sign up to be notified when it drops.
+        </p>
+
+        <ul class="cs-bullets">
+          <li>Parts & wiring diagrams</li>
+          <li>Control loop & code snippets</li>
+          <li>Simulation → real test videos</li>
+        </ul>
+
+        <div class="cs-actions">
+          <a class="cs-btn cs-btn-primary"
+             href="mailto:youremail@example.com?subject=Notify%20me%20about%20Self-Driving%20Go-Kart"
+             >Notify me</a>
+
+          <button class="cs-btn cs-btn-secondary" data-close>Close</button>
+        </div>
+
+        <p class="cs-small">Pro tip: add <code>class="coming-soon"</code> to other links to reuse this modal.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal script -->
+  <script>
+    (function () {
+      const modal = document.getElementById('comingSoonModal');
+      if (!modal) return;
+      const openers = document.querySelectorAll('a.coming-soon');
+      const closers = modal.querySelectorAll('[data-close]');
+      const overlay = modal.querySelector('.cs-overlay');
+
+      function showModal() {
+        modal.setAttribute('aria-hidden', 'false');
+        document.documentElement.style.overflow = 'hidden';
+        modal.classList.add('open');
+        const btn = modal.querySelector('.cs-close');
+        if (btn) btn.focus();
+      }
+
+      function hideModal() {
+        modal.setAttribute('aria-hidden', 'true');
+        document.documentElement.style.overflow = '';
+        modal.classList.remove('open');
+      }
+
+      openers.forEach(a => {
+        a.addEventListener('click', function (e) {
+          e.preventDefault();
+          showModal();
+        });
+      });
+
+      closers.forEach(c => c.addEventListener('click', hideModal));
+      overlay.addEventListener('click', hideModal);
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.classList.contains('open')) hideModal();
+      });
+    })();
+  </script>
+</body>
+</html>
